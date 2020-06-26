@@ -1,0 +1,33 @@
+{
+  "name": "node-red-teknoir-ingest",
+  "version": "0.0.1",
+  "description": "A set of nodes to ingest data from devices in the Teknoir Platform",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tekn0ir/node-red-teknoir-ingest.git"
+  },
+  "keywords": [
+    "node-red",
+    "teknoir",
+    "nodered",
+    "pubsub",
+    "iot"
+  ],
+  "node-red": {
+    "nodes": {
+      "teknoir-ingest": "src/ingest.js",
+      "teknoir-ack-ingest": "src/ack-ingest.js"
+    }
+  },
+  "author": "Anders Åslund <anders.aslund@teknoir.ai>",
+  "bugs": {
+    "url": "https://teknoir.ai"
+  },
+  "homepage": "https://teknoir.ai",
+  "dependencies": {
+    "@google-cloud/pubsub": "latest"
+  }
+}

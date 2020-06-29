@@ -1,0 +1,68 @@
+<script type="text/x-red" data-template-name="cloud-storage-read">
+    <div class="form-row">
+        <label for="node-input-filename"><i class="fa fa-file"></i> File Name</label>
+        <input type="text" id="node-input-filename">
+    </div>  
+    <div class="form-row">
+        <label for="node-input-list"><i class="fa fa-list"></i> List</label>
+        <input type="checkbox" id="node-input-list" style="width: 20px;">  List the files.
+    </div>    
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="cloud-storage-read">
+    <p>Read data from Cloud Storage.</p>
+    <h3>Inputs</h3>
+    <dl class="message-properties">
+        <dt>msg.filename
+            <span class="property-type">string</span>
+        </dt>
+        <dd>The name of the file in URL form.</dd>
+    </dl>
+    <h3>Outputs</h3>
+    <dl class="message-properties">
+        <dt>msg.payload
+            <span class="property-type">string</span>
+        </dt>
+        <dd>The payload read from the Cloud Storage object</dd>
+        <dt>msg.contenttype
+            <span class="property-type">string</span>
+        </dt>
+        <dd>The MIME content type of the object.</dd>
+    </dl>
+
+    <h3>Details</h3>
+    <p>This node can either read the contents of a file or list the files in a bucket.
+        If reading the contents of a file, <code>msg.filename</code> is the identity of the file to be read
+        from Cloud Storage. If listing the contents of a bucket, <code>msg.filename</code> is the identity of the
+        bucket to be listed. The format of the file name is a path string of the form
+        <code>/[PATH/TO]/[FILENAME]</code>.  Alternatively, we can specify the file to be read in the file name configuration property.
+        If both this property and a runtime value found in <code>msg.filename</code> are present, then the <code>msg.filename</code> name will be used.
+    </p>
+    The metadata associated with the file is returned in <code>msg.metadata</code>.
+    </p>
+</script>
+
+<script type="text/javascript">
+
+RED.nodes.registerType("cloud-storage-read", {
+    category: "ingest",
+    defaults: {
+        filename: { required: false },
+        list: { value: false, required: false},
+        name: { value: "", required: false }
+    },
+    inputs: 1,
+    outputs: 1,
+    icon: "tn_dark.svg",
+    align: "left",
+    color: "#3FADB5",
+    label: function () {
+        return this.name || "read-files";
+    },
+    paletteLabel: "read-files"
+});
+</script>

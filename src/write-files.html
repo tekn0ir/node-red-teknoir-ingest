@@ -1,0 +1,70 @@
+<script type="text/x-red" data-template-name="cloud-storage-write">
+    <div class="form-row">
+        <label for="node-input-filename"><i class="fa fa-file"></i> File Name</label>
+        <input type="text" id="node-input-filename">
+    </div>
+    <div class="form-row">
+            <label for="node-input-contentType"><i class="fa fa-info-circle"></i> Content Type</label>
+            <input type="text" id="node-input-contentType">
+        </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="cloud-storage-write">
+    <p>Write data to Cloud Storage.</p>
+    <h3>Inputs</h3>
+    <dl class="message-properties">
+        <dt>msg.payload
+            <span class="property-type">string</span>
+        </dt>
+        <dd>The payload to write to the Cloud Storage object</dd>
+
+        <dt>msg.filename
+            <span class="property-type">string</span>
+        </dt>
+        <dd>The name of the file in URL form.</dd>
+        
+        <dt>msg.contentType
+            <span class="property-type">string</span>
+        </dt>
+        <dd>[Optional] The MIME content type of the object.</dd>
+    </dl>
+
+    <h3>Details</h3>
+    <p>This node writes the content of the payload to a Cloud Storage object.
+
+        On execution, the data contained in <code>msg.payload</code> is written into the file specified by <code>msg.filename</code>.
+        The format of this field is a GCS Url of the form <code>/[PATH/TO]/[FILE]</code>.
+        Optionally, the file to be written can be supplied as the file name property during configuration.  If both are supplied,
+        the <code>msg.filename</code> will be used. 
+
+        An optional field called <code>msg.contentType</code> contains the MIME type to be associated with the file.
+        If this is not specified but a configuration property for content type is, then THAT will be used.  If neither are supplied,
+        then we don't specify a content type for the Cloud Storage file.
+    </p>
+</script>
+
+<script type="text/javascript">
+RED.nodes.registerType("cloud-storage-write", {
+    category: "ingest",
+    defaults: {
+        account:     { type: "google-cloud-credentials", required: false },
+        keyFilename: { value: "", required: false },
+        filename:    { value: "", required: false },
+        contentType: { value: "", required: false },
+        name:        { value: "", required: false }
+    },
+    inputs: 1,
+    outputs: 1,
+    icon: "tn_dark.svg",
+    align: "right",
+    color: "#3FADB5",
+    label: function () {
+        return this.name || "write-files";
+    },
+    paletteLabel: "write-files"
+});
+</script>

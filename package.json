@@ -19,7 +19,9 @@
   "node-red": {
     "nodes": {
       "teknoir-ingest": "src/ingest.js",
-      "teknoir-ack-ingest": "src/ack-ingest.js"
+      "teknoir-ack-ingest": "src/ack-ingest.js",
+      "teknoir-read": "src/read-files.js",
+      "teknoir-write": "src/write-files.js"
     }
   },
   "author": "Anders Åslund <anders.aslund@teknoir.ai>",
@@ -28,6 +30,7 @@
   },
   "homepage": "https://teknoir.ai",
   "dependencies": {
-    "@google-cloud/pubsub": "latest"
+    "@google-cloud/pubsub": "latest",
+    "@google-cloud/storage": "latest"
   }
 }

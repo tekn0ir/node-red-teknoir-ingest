@@ -25,7 +25,7 @@
         <dt>msg.filename
             <span class="property-type">string</span>
         </dt>
-        <dd>The name of the file in URL form.</dd>
+        <dd>The name of the file in path form.</dd>
         
         <dt>msg.contentType
             <span class="property-type">string</span>
@@ -37,7 +37,7 @@
     <p>This node writes the content of the payload to a Cloud Storage object.
 
         On execution, the data contained in <code>msg.payload</code> is written into the file specified by <code>msg.filename</code>.
-        The format of this field is a GCS Url of the form <code>/[PATH/TO]/[FILE]</code>.
+        The format of this field is a regular path of the form <code>/[PATH/TO]/[FILE]</code>.
         Optionally, the file to be written can be supplied as the file name property during configuration.  If both are supplied,
         the <code>msg.filename</code> will be used. 
 

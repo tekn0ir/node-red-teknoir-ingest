@@ -51,8 +51,6 @@
 RED.nodes.registerType("cloud-storage-write", {
     category: "ingest",
     defaults: {
-        account:     { type: "google-cloud-credentials", required: false },
-        keyFilename: { value: "", required: false },
         filename:    { value: "", required: false },
         contentType: { value: "", required: false },
         name:        { value: "", required: false }

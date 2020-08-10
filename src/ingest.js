@@ -8,8 +8,8 @@ module.exports = function(RED) {
     };
 
     const STATUS_CONNECTED_WITH_ERRORS = {
-        fill: "orange",
-        shape: "dot",
+        fill: "green",
+        shape: "ring",
         text: "connected_with_errors"
     };
 

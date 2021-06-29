@@ -25,9 +25,21 @@ module.exports = function(RED) {
         text: "connecting"
     };
 
-    const {RETRY_CODES} = require('@google-cloud/pubsub/build/src/pull-retry');
-    RETRY_CODES.push(1);
-    const {PubSub} = require("@google-cloud/pubsub");
+    const { RETRY_CODES } = require('@google-cloud/pubsub/build/src/pull-retry');
+    const { Status } = require('google-gax');
+
+
+    RETRY_CODES.push(
+        Status.DEADLINE_EXCEEDED,
+        Status.RESOURCE_EXHAUSTED,
+        Status.ABORTED,
+        Status.INTERNAL,
+        Status.UNAVAILABLE,
+        Status.CANCELLED,
+    );
+
+
+    const { PubSub } = require("@google-cloud/pubsub");
 
     function Ingest(config) {
         let pubsub = null;
@@ -52,13 +64,14 @@ module.exports = function(RED) {
 
         // Called when a new message is received from PubSub.
         function OnMessage(message) {
+            node.status(STATUS_CONNECTED);
             if (message === null) {
                 return;
             }
 
             const msg = {
-                "payload": message.data,    // Save the payload data at msg.payload
-                "attributes": message.attributes  // Save the attributes data at msg.attributes
+                "payload": message.data, // Save the payload data at msg.payload
+                "attributes": message.attributes // Save the attributes data at msg.attributes
             };
 
             // If the configuration property asked for JSON, then convert to an object.
@@ -69,14 +82,14 @@ module.exports = function(RED) {
             try {
                 node.send(msg);
                 if (config.backpressure === true) {
-                    msg.ingestAck = function () {
+                    msg.ingestAck = function() {
                         // console.log("message.ack()");
                         message.ack();
                     };
                 } else {
                     message.ack();
                 }
-           } catch (e) {
+            } catch (e) {
                 if (e.details) {
                     node.error(e.details);
                 } else {
@@ -97,7 +110,7 @@ module.exports = function(RED) {
         function OnClose() {
             node.status(STATUS_DISCONNECTED);
             if (subscription) {
-                subscription.close();  // No longer receive messages.
+                subscription.close(); // No longer receive messages.
                 subscription.removeListener('message', OnMessage);
                 subscription.removeListener('error', OnError);
                 subscription = null;
@@ -113,8 +126,44 @@ module.exports = function(RED) {
             },
         };
 
-        node.status(STATUS_CONNECTING);                              // Flag the node as connecting.
-        pubsub.subscription(options.subscription, subscriberOptions).get().then((data) => {
+        const retrySettings = {
+            retryCodes: RETRY_CODES,
+            backoffSettings: {
+                maxRetries: 10000,
+                // The initial delay time, in milliseconds, between the completion
+                // of the first failed request and the initiation of the first retrying request.
+                initialRetryDelayMillis: 1000,
+                // The multiplier by which to increase the delay time between the completion
+                // of failed requests, and the initiation of the subsequent retrying request.
+                retryDelayMultiplier: 10,
+                // The maximum delay time, in milliseconds, between requests.
+                // When this value is reached, retryDelayMultiplier will no longer be used to increase delay time.
+                maxRetryDelayMillis: 60000 * 5,
+                // The initial timeout parameter to the request.
+                initialRpcTimeoutMillis: 5000,
+                // The multiplier by which to increase the timeout parameter between failed requests.
+                rpcTimeoutMultiplier: 2.0,
+                // The maximum timeout parameter, in milliseconds, for a request. When this value is reached,
+                // rpcTimeoutMultiplier will no longer be used to increase the timeout.
+                maxRpcTimeoutMillis: 600000,
+                // The total time, in milliseconds, starting from when the initial request is sent,
+                // after which an error will be returned, regardless of the retrying attempts made meanwhile.
+                totalTimeoutMillis: 600000,
+            },
+        };
+
+        node.status(STATUS_CONNECTING); // Flag the node as connecting.
+        pubsub.subscription(options.subscription, subscriberOptions).get({
+            gaxOpts: {
+                maxRetries: 10000, // seems this  controls reconnections as well
+                retry: retrySettings
+                    // new RetryOptions(RETRY_CODES, {
+                    //     initialRetryDelayMillis: 100 * 1000,
+                    //     retryDelayMultiplier: 2,
+                    //     maxRetryDelayMillis: 100 * 1000
+                    // })
+            }
+        }).then((data) => {
             subscription = data[0];
             subscription.on('message', OnMessage);
             subscription.on('error', OnError);
